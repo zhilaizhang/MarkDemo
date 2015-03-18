@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/mark_edit_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        >
+        <ImageButton
+            android:id="@+id/back_btn"
+            android:src="@drawable/img_back_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            />
+        <TextView
+            android:text="@string/string_mark_edit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            />
+        <Button
+            android:id="@+id/save_btn"
+            android:text="@string/string_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_below="@id/mark_edit_title"
+        android:id="@+id/content_input_linearlayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        >
+           <LinearLayout
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               > 
+               <TextView
+                   android:text="@string/string_mark_title"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content" />
+               <EditText
+                   android:id="@+id/markedit_title_edittext"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content" />
+               </LinearLayout>
+        <View
+            android:background="@color/mark_edit_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
+        
+        <EditText
+            android:id="@+id/content_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linearlayout_get_images"
+            android:layout_alignParentBottom="true"
+            android:background="#ff0000"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="100dp">
+            <Button
+                android:id="@+id/button_get_image"
+                android:src="@drawable/icon_get_image"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <GridView
+                android:id="@+id/gridview"
+                android:layout_width="wrap_content"
+                android:layout_height="350dp"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:horizontalSpacing="3dp"
+                android:numColumns="4"
+                android:scrollbars="none"
+                android:verticalSpacing="5dp" >
+            </GridView>
+         </LinearLayout>
+</RelativeLayout>

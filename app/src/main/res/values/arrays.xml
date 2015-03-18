@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="select_image_type">
+        <item>@string/select_from_local</item>
+        <item>@string/take_photo</item>
+    </string-array>
+</resources>
