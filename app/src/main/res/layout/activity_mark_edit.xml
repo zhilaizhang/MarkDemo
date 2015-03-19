@@ -68,19 +68,20 @@
         <LinearLayout
             android:id="@+id/linearlayout_get_images"
             android:layout_alignParentBottom="true"
-            android:background="#ff0000"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="100dp">
+            android:layout_height="wrap_content">
             <Button
                 android:id="@+id/button_get_image"
+                android:text="添加图片"
                 android:src="@drawable/icon_get_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <GridView
                 android:id="@+id/gridview"
-                android:layout_width="wrap_content"
-                android:layout_height="350dp"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:horizontalSpacing="3dp"
