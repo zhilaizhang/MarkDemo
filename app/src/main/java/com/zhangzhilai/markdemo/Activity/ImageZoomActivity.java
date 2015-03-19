@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -114,6 +115,7 @@ public class ImageZoomActivity extends Activity implements View.OnClickListener{
             int size = dataList.size();
             for (int i = 0; i != size; i++) {
                 ImageView iv = new ImageView(ImageZoomActivity.this);
+                Log.d(TAG, "test sourcePath: " + dataList.get(i).sourcePath);
                 ImageDisplayer.getInstance(ImageZoomActivity.this).displayBmp(iv, null, dataList.get(i).sourcePath, false);
                 iv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 mViews.add(iv);

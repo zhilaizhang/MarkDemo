@@ -1,14 +1,47 @@
 package com.zhangzhilai.markdemo.Utils;
 
-/**
- * Created by zhangzhilai on 3/18/15.
- * 图片操作的一些配置信息
- */
-public class IMAGEUtils {
-    public static final int RESULT_OK = 0x000088;                    //表示跳转成功
-    public static final int TAKE_PICTURE_FROM_CAMERA = 0x000000;     //从相机获取图片
-    public static final int TAKE_PICTURE_FROM_ALBUM = 0X000001;      //从相册获取图片
-    public static final int BUCKETCHOOSE_TO_IMAGECHOOSE = 0x000002;  //由相册跳转到图片库
-    public static final int IMAGE_ZOOM = 0x000003;                   //从编辑页跳转到图片查看页面
+import android.content.Context;
+import android.graphics.Bitmap;
 
+
+
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+
+import com.zhangzhilai.markdemo.R;
+
+/**
+ * Created by zhangzhilai on 3/19/15.
+ */
+public class ImageUtils {
+    private static boolean isConfiged = false;
+
+    /**
+     * 获得Imageloader对象，封装配置的过程（根据Imageloader的文档，应该统一配置）
+     *
+     * @param context
+     * @return 2014-8-18
+     */
+    public static ImageLoader getImageLoader(Context context) {
+        if (!isConfiged) {
+            ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)
+                    .threadPriority(Thread.NORM_PRIORITY - 2).denyCacheImageMultipleSizesInMemory()
+                    .diskCacheFileNameGenerator(new Md5FileNameGenerator()).diskCacheSize(50 * 1024 * 1024) // 50 Mb
+                    .tasksProcessingOrder(QueueProcessingType.LIFO).writeDebugLogs() // Remove for release app
+                    .build();
+            ImageLoader.getInstance().init(config);
+            isConfiged = true;
+        }
+        return ImageLoader.getInstance();
+    }
+
+    public static DisplayImageOptions getDefaultImageOptions() {
+        // TODO: 添加图片加载过程对应的图片
+        return new DisplayImageOptions.Builder().showImageOnFail(R.drawable.pic_normal)
+                .showImageForEmptyUri(R.drawable.pic_normal).cacheInMemory(true).cacheOnDisk(true)
+                .considerExifParams(true).bitmapConfig(Bitmap.Config.RGB_565).build();
+    }
 }

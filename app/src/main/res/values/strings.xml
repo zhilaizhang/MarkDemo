@@ -19,5 +19,16 @@
     <string name="take_photo">拍照</string>
     <string name="select_from_local">从相册中选取</string>
 
+    <!-- 下拉刷新 -->
+    <string name="pull_down_RefreshingLabel">刷新中</string>
+    <string name="pull_down_PullLabel">下拉刷新</string>
+    <string name="pull_down_ReleaseLabel">松开刷新</string>
+    <string name="pull_up_RefreshingLabel">加载中</string>
+    <string name="pull_up_PullLabel">上拉加载更多</string>
+    <string name="pull_up_ReleaseLabel">松开加载更多</string>
+
+    <!--  标记圈  -->
+    <string name="string_edit">编辑</string>
+    <string name="string_delete">删除</string>
 
 </resources>

@@ -25,7 +25,7 @@ import com.zhangzhilai.markdemo.MarkEditActivity;
 import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.R;
 import com.zhangzhilai.markdemo.Utils.CustomConstants;
-import com.zhangzhilai.markdemo.Utils.IMAGEUtils;
+import com.zhangzhilai.markdemo.Utils.MarkUtils;
 import com.zhangzhilai.markdemo.Utils.IntentConstants;
 
 
@@ -90,7 +90,7 @@ public class ImageChooseActivity extends  Activity {
                 Intent intent = new Intent(ImageChooseActivity.this, MarkEditActivity.class);
                 intent.putExtra(IntentConstants.EXTRA_IMAGE_LIST, (Serializable) new ArrayList<ImageItem>(selectedImgs.values()));
 //                startActivity(intent);
-                setResult(IMAGEUtils.RESULT_OK, intent);
+                setResult(MarkUtils.RESULT_OK, intent);
                 finish();
             }
 

@@ -27,7 +27,7 @@ import com.zhangzhilai.markdemo.Activity.ImageZoomActivity;
 import com.zhangzhilai.markdemo.Adapter.ImagePublishAdapter;
 import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.Utils.CustomConstants;
-import com.zhangzhilai.markdemo.Utils.IMAGEUtils;
+import com.zhangzhilai.markdemo.Utils.MarkUtils;
 import com.zhangzhilai.markdemo.Utils.IntentConstants;
 
 import java.io.File;
@@ -119,7 +119,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
                     Intent intent = new Intent(MarkEditActivity.this, ImageZoomActivity.class);
                     intent.putExtra(IntentConstants.EXTRA_IMAGE_LIST, (Serializable) mDataList);
                     intent.putExtra(IntentConstants.EXTRA_CURRENT_IMG_POSITION, position);
-                    startActivityForResult(intent, IMAGEUtils.IMAGE_ZOOM);
+                    startActivityForResult(intent, MarkUtils.IMAGE_ZOOM);
                 }
             }
         });
@@ -137,7 +137,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
                     case 0:
                         Intent intent = new Intent(mContext, ImageBucketChooseActivity.class);
                         intent.putExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, getAvailableSize());
-                        startActivityForResult(intent, IMAGEUtils.TAKE_PICTURE_FROM_ALBUM);
+                        startActivityForResult(intent, MarkUtils.TAKE_PICTURE_FROM_ALBUM);
                         break;
                     case 1:
                         takePhoto();
@@ -170,7 +170,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
         mPath = vFile.getPath();
         Uri cameraUri = Uri.fromFile(vFile);
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
-        startActivityForResult(openCameraIntent, IMAGEUtils.TAKE_PICTURE_FROM_CAMERA);
+        startActivityForResult(openCameraIntent, MarkUtils.TAKE_PICTURE_FROM_CAMERA);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
         Log.d(TAG, "test onActivityResult");
         System.out.println("requestCode: " + requestCode + "resultCode" + resultCode);
         switch (requestCode) {
-            case IMAGEUtils.TAKE_PICTURE_FROM_CAMERA:
+            case MarkUtils.TAKE_PICTURE_FROM_CAMERA:
                 if (mDataList.size() < CustomConstants.MAX_IMAGE_SIZE && resultCode == -1 && !TextUtils.isEmpty(mPath)) {
                     ImageItem item = new ImageItem();
                     item.sourcePath = mPath;
@@ -186,11 +186,11 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
                 }
                 refreshImageView();
                 break;
-            case IMAGEUtils.IMAGE_ZOOM:
+            case MarkUtils.IMAGE_ZOOM:
                 refreshImageView();
                 break;
-            case IMAGEUtils.TAKE_PICTURE_FROM_ALBUM:
-                if(resultCode == IMAGEUtils.RESULT_OK){
+            case MarkUtils.TAKE_PICTURE_FROM_ALBUM:
+                if(resultCode == MarkUtils.RESULT_OK){
                     List<ImageItem> incomingDataList = (List<ImageItem>) data.getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
                     ImageItem item = incomingDataList.get(0);
                     if (incomingDataList != null) {
