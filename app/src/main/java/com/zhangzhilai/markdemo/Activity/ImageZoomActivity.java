@@ -23,55 +23,41 @@ import com.zhangzhilai.markdemo.Utils.IntentConstants;
 /**
  * Created by zhangzhilai on 3/17/15.
  */
-public class ImageZoomActivity extends Activity {
+public class ImageZoomActivity extends Activity implements View.OnClickListener{
 
-    private ViewPager pager;
-    private MyPageAdapter adapter;
-    private int currentPosition;
+    public  static final String TAG = "ImageZoomActivity";
+
+    private ViewPager mPager;
+    private MyPageAdapter mAdapter;
+    private int mCurrentPosition;
     private List<ImageItem> mDataList = new ArrayList<ImageItem>();
 
-    private RelativeLayout photo_relativeLayout;
+    private RelativeLayout mPhotoRelativeLayout;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_zoom);
 
-        photo_relativeLayout = (RelativeLayout) findViewById(R.id.photo_relativeLayout);
-        photo_relativeLayout.setBackgroundColor(0x70000000);
+        mPhotoRelativeLayout = (RelativeLayout) findViewById(R.id.photo_relativeLayout);
+        mPhotoRelativeLayout.setBackgroundColor(0x70000000);
 
         initData();
 
         Button photo_bt_exit = (Button) findViewById(R.id.photo_bt_exit);
-        photo_bt_exit.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        photo_bt_exit.setOnClickListener(this);
         Button photo_bt_del = (Button) findViewById(R.id.photo_bt_del);
-        photo_bt_del.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if (mDataList.size() == 1) {
-                    removeImgs();
-                    finish();
-                } else {
-                    removeImg(currentPosition);
-                    pager.removeAllViews();
-                    adapter.removeView(currentPosition);
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        });
+        photo_bt_del.setOnClickListener(this);
 
-        pager = (ViewPager) findViewById(R.id.viewpager);
-        pager.setOnPageChangeListener(pageChangeListener);
+        mPager = (ViewPager) findViewById(R.id.viewpager);
+        mPager.setOnPageChangeListener(pageChangeListener);
 
-        adapter = new MyPageAdapter(mDataList);
-        pager.setAdapter(adapter);
-        pager.setCurrentItem(currentPosition);
+        mAdapter = new MyPageAdapter(mDataList);
+        mPager.setAdapter(mAdapter);
+        mPager.setCurrentItem(mCurrentPosition);
     }
 
     private void initData() {
-        currentPosition = getIntent().getIntExtra(IntentConstants.EXTRA_CURRENT_IMG_POSITION, 0);
+        mCurrentPosition = getIntent().getIntExtra(IntentConstants.EXTRA_CURRENT_IMG_POSITION, 0);
         mDataList = MarkEditActivity.mDataList;
     }
 
@@ -88,7 +74,7 @@ public class ImageZoomActivity extends Activity {
     private OnPageChangeListener pageChangeListener = new OnPageChangeListener() {
 
         public void onPageSelected(int arg0) {
-            currentPosition = arg0;
+            mCurrentPosition = arg0;
         }
 
         public void onPageScrolled(int arg0, float arg1, int arg2) {
@@ -98,6 +84,26 @@ public class ImageZoomActivity extends Activity {
 
         }
     };
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.photo_bt_exit:
+                finish();
+                break;
+            case R.id.photo_bt_del:
+                if (mDataList.size() == 1) {
+                    removeImgs();
+                    finish();
+                } else {
+                    removeImg(mCurrentPosition);
+                    mPager.removeAllViews();
+                    mAdapter.removeView(mCurrentPosition);
+                    mAdapter.notifyDataSetChanged();
+                }
+                break;
+        }
+    }
 
     class MyPageAdapter extends PagerAdapter {
         private List<ImageItem> dataList = new ArrayList<ImageItem>();
