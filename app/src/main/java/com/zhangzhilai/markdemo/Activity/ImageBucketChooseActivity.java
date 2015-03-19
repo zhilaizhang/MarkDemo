@@ -12,6 +12,7 @@ import com.zhangzhilai.markdemo.Adapter.ImageBucketAdapter;
 import com.zhangzhilai.markdemo.Model.ImageBucket;
 import com.zhangzhilai.markdemo.R;
 import com.zhangzhilai.markdemo.Utils.CustomConstants;
+import com.zhangzhilai.markdemo.Utils.IMAGEUtils;
 import com.zhangzhilai.markdemo.Utils.ImageFetcher;
 import com.zhangzhilai.markdemo.Utils.IntentConstants;
 
@@ -68,10 +69,17 @@ public class ImageBucketChooseActivity  extends Activity implements View.OnClick
                 intent.putExtra(IntentConstants.EXTRA_IMAGE_LIST, (Serializable) mDataList.get(position).imageList);
                 intent.putExtra(IntentConstants.EXTRA_BUCKET_NAME, mDataList.get(position).bucketName);
                 intent.putExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, availableSize);
-
-                startActivity(intent);
+                startActivityForResult(intent, IMAGEUtils.BUCKETCHOOSE_TO_IMAGECHOOSE);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode == IMAGEUtils.BUCKETCHOOSE_TO_IMAGECHOOSE && resultCode == IMAGEUtils.RESULT_OK){
+            setResult(IMAGEUtils.RESULT_OK, data);
+            finish();
+        }
     }
 
     private void selectOne(int position)

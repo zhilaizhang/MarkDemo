@@ -9,10 +9,8 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.PersistableBundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,7 +29,6 @@ import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.Utils.CustomConstants;
 import com.zhangzhilai.markdemo.Utils.IMAGEUtils;
 import com.zhangzhilai.markdemo.Utils.IntentConstants;
-import com.zhangzhilai.markdemo.Views.MultiImagePickerView;
 
 import java.io.File;
 import java.io.Serializable;
@@ -44,14 +41,14 @@ import java.util.List;
 public class MarkEditActivity extends Activity implements View.OnClickListener{
 
     public  static final String TAG = "MarkEditActivity";
-//    private static final int TAKE_PICTURE = 0x000000;
 
     public static List<ImageItem> mDataList = new ArrayList<ImageItem>();
     private Context mContext;
-    private ImageButton mBackButton;
+
     private Button   mSaveButton;
     private Button   mGetImageBtn;
     private GridView mGridView;
+    private ImageButton mBackButton;
 
     private ImagePublishAdapter mAdapter;
 
@@ -78,7 +75,11 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
         saveTempToPref();
     }
 
-
+    private void initData() {
+        if(mDataList.size() != 0){
+            mDataList.clear();
+        }
+    }
     private void initViews() {
         mBackButton = (ImageButton) findViewById(R.id.back_btn);
         mSaveButton = (Button) findViewById(R.id.save_btn);
@@ -92,10 +93,10 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
 
         mAdapter = new ImagePublishAdapter(this, mDataList);
         mGridView.setAdapter(mAdapter);
-        hasImageView();
+        refreshImageView();
     }
 
-    private void hasImageView(){
+    private void refreshImageView(){
         if(mDataList.size() == 0 ){
             mGetImageBtn.setVisibility(View.VISIBLE);
             mGridView.setVisibility(View.GONE);
@@ -124,13 +125,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
         });
     }
 
-    private void initData() {
-        getTempFromPref();
-        List<ImageItem> incomingDataList = (List<ImageItem>) getIntent().getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
-        if (incomingDataList != null) {
-            mDataList.addAll(incomingDataList);
-        }
-    }
+
 
 
 
@@ -142,7 +137,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
                     case 0:
                         Intent intent = new Intent(mContext, ImageBucketChooseActivity.class);
                         intent.putExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, getAvailableSize());
-                        mContext.startActivity(intent);
+                        startActivityForResult(intent, IMAGEUtils.TAKE_PICTURE_FROM_ALBUM);
                         break;
                     case 1:
                         takePhoto();
@@ -175,23 +170,34 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
         mPath = vFile.getPath();
         Uri cameraUri = Uri.fromFile(vFile);
         openCameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
-        startActivityForResult(openCameraIntent, IMAGEUtils.TAKE_PICTURE);
+        startActivityForResult(openCameraIntent, IMAGEUtils.TAKE_PICTURE_FROM_CAMERA);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "test onActivityResult");
         System.out.println("requestCode: " + requestCode + "resultCode" + resultCode);
         switch (requestCode) {
-            case IMAGEUtils.TAKE_PICTURE:
+            case IMAGEUtils.TAKE_PICTURE_FROM_CAMERA:
                 if (mDataList.size() < CustomConstants.MAX_IMAGE_SIZE && resultCode == -1 && !TextUtils.isEmpty(mPath)) {
                     ImageItem item = new ImageItem();
                     item.sourcePath = mPath;
                     mDataList.add(item);
                 }
-                hasImageView();
+                refreshImageView();
                 break;
             case IMAGEUtils.IMAGE_ZOOM:
-                hasImageView();
+                refreshImageView();
+                break;
+            case IMAGEUtils.TAKE_PICTURE_FROM_ALBUM:
+                if(resultCode == IMAGEUtils.RESULT_OK){
+                    List<ImageItem> incomingDataList = (List<ImageItem>) data.getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
+                    ImageItem item = incomingDataList.get(0);
+                    if (incomingDataList != null) {
+                        mDataList.addAll(incomingDataList);
+                    }
+                }
+                refreshImageView();
                 break;
         }
     }
@@ -228,7 +234,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.back_btn:
-
+                finish();
                 break;
             case R.id.save_btn:
 
@@ -243,12 +249,14 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "test onResume");
         notifyDataChanged(); // 当在ImageZoomActivity中删除图片时，返回这里需要刷新
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        Log.d(TAG, "test onPause");
         saveTempToPref();
     }
 
@@ -256,10 +264,11 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
     protected void onDestroy() {
         super.onDestroy();
         mDataList.clear();
-        removeTempFromPref();
+
     }
 
     private void notifyDataChanged() {
+        Log.d(TAG, "test notifyDataChanged");
         mAdapter.notifyDataSetChanged();
     }
 
