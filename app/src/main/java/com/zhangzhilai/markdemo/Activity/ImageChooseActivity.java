@@ -25,6 +25,7 @@ import com.zhangzhilai.markdemo.MarkEditActivity;
 import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.R;
 import com.zhangzhilai.markdemo.Utils.CustomConstants;
+import com.zhangzhilai.markdemo.Utils.IMAGEUtils;
 import com.zhangzhilai.markdemo.Utils.IntentConstants;
 
 
@@ -32,9 +33,12 @@ import com.zhangzhilai.markdemo.Utils.IntentConstants;
  * Created by zhangzhilai on 3/17/15.
  */
 public class ImageChooseActivity extends  Activity {
+
+    public  static final String TAG = "ImageChooseActivity";
+
     private List<ImageItem> mDataList = new ArrayList<ImageItem>();
     private String mBucketName;
-    private int availableSize;
+    private int mAvailableSize;
     private GridView mGridView;
     private TextView mBucketNameTv;
     private TextView mBackTv;
@@ -57,7 +61,7 @@ public class ImageChooseActivity extends  Activity {
         if (TextUtils.isEmpty(mBucketName)) {
             mBucketName = "请选择";
         }
-        availableSize = getIntent().getIntExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, CustomConstants.MAX_IMAGE_SIZE);
+        mAvailableSize = getIntent().getIntExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, CustomConstants.MAX_IMAGE_SIZE);
 
         initView();
         initListener();
@@ -75,7 +79,7 @@ public class ImageChooseActivity extends  Activity {
         mGridView.setAdapter(mAdapter);
         mFinishBtn = (Button) findViewById(R.id.finish_btn);
 
-        mFinishBtn.setText("完成" + "(" + selectedImgs.size() + "/" + availableSize + ")");
+        mFinishBtn.setText("完成" + "(" + selectedImgs.size() + "/" + mAvailableSize + ")");
         mAdapter.notifyDataSetChanged();
     }
 
@@ -85,7 +89,8 @@ public class ImageChooseActivity extends  Activity {
             public void onClick(View v) {
                 Intent intent = new Intent(ImageChooseActivity.this, MarkEditActivity.class);
                 intent.putExtra(IntentConstants.EXTRA_IMAGE_LIST, (Serializable) new ArrayList<ImageItem>(selectedImgs.values()));
-                startActivity(intent);
+//                startActivity(intent);
+                setResult(IMAGEUtils.RESULT_OK, intent);
                 finish();
             }
 
@@ -101,15 +106,15 @@ public class ImageChooseActivity extends  Activity {
                     item.isSelected = false;
                     selectedImgs.remove(item.imageId);
                 } else {
-                    if (selectedImgs.size() >= availableSize) {
-                        Toast.makeText(ImageChooseActivity.this, "最多选择" + availableSize + "张图片", Toast.LENGTH_SHORT).show();
+                    if (selectedImgs.size() >= mAvailableSize) {
+                        Toast.makeText(ImageChooseActivity.this, "最多选择" + mAvailableSize + "张图片", Toast.LENGTH_SHORT).show();
                         return;
                     }
                     item.isSelected = true;
                     selectedImgs.put(item.imageId, item);
                 }
 
-                mFinishBtn.setText("完成" + "(" + selectedImgs.size() + "/" + availableSize + ")");
+                mFinishBtn.setText("完成" + "(" + selectedImgs.size() + "/" + mAvailableSize + ")");
                 mAdapter.notifyDataSetChanged();
             }
 
