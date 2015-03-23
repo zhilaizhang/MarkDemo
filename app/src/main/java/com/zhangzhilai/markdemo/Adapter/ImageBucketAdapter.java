@@ -51,24 +51,23 @@ public class ImageBucketAdapter extends BaseAdapter {
             mHolder.titleTv = (TextView) convertView.findViewById(R.id.title);
             mHolder.countTv = (TextView) convertView.findViewById(R.id.count);
             convertView.setTag(mHolder);
-        }
-        else{
+        } else {
             mHolder = (ViewHolder) convertView.getTag();
         }
 
         final ImageBucket item = mDataList.get(position);
 
-        if (item.imageList != null && item.imageList.size() > 0){
-            String thumbPath = item.imageList.get(0).thumbnailPath;
-            String sourcePath = item.imageList.get(0).sourcePath;
+        if (item.getImageList() != null && item.getImageList().size() > 0){
+            String thumbPath = item.getImageList().get(0).thumbnailPath;
+            String sourcePath = item.getImageList().get(0).sourcePath;
             ImageDisplayer.getInstance(mContext).displayBmp(mHolder.coverIv, thumbPath,
                     sourcePath);
         } else {
             mHolder.coverIv.setImageBitmap(null);
         }
 
-        mHolder.titleTv.setText(item.bucketName);
-        mHolder.countTv.setText(item.count + "张");
+        mHolder.titleTv.setText(item.getBucketName());
+        mHolder.countTv.setText(item.getCount() + "张");
 
         return convertView;
     }

@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.R;
+import com.zhangzhilai.markdemo.Utils.ImageDisplayer;
 import com.zhangzhilai.markdemo.Utils.ImageUtils;
 import com.zhangzhilai.markdemo.Views.CircleImageView;
 
@@ -20,22 +22,22 @@ import java.util.ArrayList;
 public class MarkCircleImageAdapter extends BaseAdapter{
 
     public static final String TAG = "MarkCircleImageAdapter";
-    private Context mContext;
-    private ArrayList<String> mImagePathList;
-    private String mImageItemPath;
+    private Context     mContext;
+    private ImageItem   mImageItem;
     private ImageLoader mImageLoader;
+    private ArrayList<ImageItem> mImageItemList;
 
-    public MarkCircleImageAdapter(Context mContext, ArrayList<String> imagePathList) {
+    public MarkCircleImageAdapter(Context mContext, ArrayList<ImageItem> imageItemList) {
         this.mContext = mContext;
-        this.mImagePathList = imagePathList;
+        this.mImageItemList = imageItemList;
         mImageLoader = ImageUtils.getImageLoader(mContext);
     }
 
 
     @Override
     public int getCount() {
-        if(mImagePathList != null){
-            return  mImagePathList.size();
+        if(mImageItemList != null){
+            return  mImageItemList.size();
         } else {
             return 0;
         }
@@ -43,8 +45,8 @@ public class MarkCircleImageAdapter extends BaseAdapter{
 
     @Override
     public Object getItem(int position) {
-        if(mImagePathList != null){
-            return  mImagePathList.get(position);
+        if(mImageItemList != null){
+            return  mImageItemList.get(position);
         } else {
             return null;
         }
@@ -59,7 +61,7 @@ public class MarkCircleImageAdapter extends BaseAdapter{
     public View getView(int position, View convertView, ViewGroup parent) {
         View view = convertView;
         ViewHolder viewHolder;
-        if(mImagePathList == null){
+        if(mImageItemList == null){
             return null;
         }
         if(view == null){
@@ -71,9 +73,19 @@ public class MarkCircleImageAdapter extends BaseAdapter{
             viewHolder = (ViewHolder)view.getTag();
         }
 
-        mImageItemPath = mImagePathList.get(position);
-        mImageLoader.displayImage(mImageItemPath, viewHolder.mCircleImageView, ImageUtils.getDefaultImageOptions());
-
+        mImageItem = mImageItemList.get(position);
+        if(mImageItem == null){
+            return null;
+        }
+        String imagePath = mImageItem.getSourcePath();
+        String tempPath;
+        if(imagePath.contains("http://") || imagePath.contains("file://")){
+            tempPath = imagePath;
+        } else {
+            tempPath = "file://" + imagePath;
+        }
+        mImageLoader.displayImage(tempPath, viewHolder.mCircleImageView, ImageUtils.getDefaultImageOptions());
+//        ImageDisplayer.getInstance(mContext).displayBmp(viewHolder.mCircleImageView, mImageItem.thumbnailPath, mImageItem.sourcePath);
         return view;
     }
 

@@ -1,19 +1,27 @@
 package com.zhangzhilai.markdemo.Adapter;
 
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.zhangzhilai.markdemo.Activity.ImageZoomActivity;
+import com.zhangzhilai.markdemo.MarkEditActivity;
+import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.Model.MarkCircleItem;
 import com.zhangzhilai.markdemo.R;
 import com.zhangzhilai.markdemo.Utils.MarkUtils;
 import com.zhangzhilai.markdemo.Views.ImageGridView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -25,7 +33,8 @@ public class MarkCircleAdapter extends BindableAdapter<MarkCircleItem>{
     public static final String TAG = "MarkCircleAdapter";
     private Context mContext;
     private ArrayList<MarkCircleItem> mMarkCircleList;
-    private MarkCircleItem mMarkCircleItem;
+    private ArrayList<ImageItem> mMarkImageItemList;
+
     private MarkCircleImageAdapter mMarkCircleAdapter;
 
     private String mMarkId;
@@ -33,7 +42,7 @@ public class MarkCircleAdapter extends BindableAdapter<MarkCircleItem>{
     private String mMarkTime;
     private String mMarkContent;
     private String mMarkAddress;
-    private ArrayList<String> mMarkImagePathList;
+
 
 
     public MarkCircleAdapter(Context context) {
@@ -66,6 +75,7 @@ public class MarkCircleAdapter extends BindableAdapter<MarkCircleItem>{
 
     @Override
     public View newView(LayoutInflater inflater, int position, ViewGroup container) {
+        Log.d(TAG, "test newView position" + position);
         View view;
         ViewHolder viewHolder = new ViewHolder();
         view = inflater.inflate(R.layout.item_mark_circle, null);
@@ -84,13 +94,15 @@ public class MarkCircleAdapter extends BindableAdapter<MarkCircleItem>{
 
     @Override
     public void bindView(MarkCircleItem item, int position, View view) {
-        mMarkCircleItem = mMarkCircleList.get(position);
+        Log.d(TAG, "test bindView position" + position);
+
+        MarkCircleItem mMarkCircleItem = mMarkCircleList.get(position);
         if(mMarkCircleItem == null || view == null){
             return;
         }
-        initDatas();
+        initDatas(mMarkCircleItem);
         final ViewHolder viewHolder = (ViewHolder)view.getTag();
-        if(!MarkUtils.textIsEmpty(mMarkContent) && mMarkImagePathList != null && mMarkImagePathList.size() != 0){ //有图片和内容
+        if(!MarkUtils.textIsEmpty(mMarkContent) && mMarkImageItemList != null && mMarkImageItemList.size() != 0){ //有图片和内容
             viewHolder.markTypeImageView.setBackgroundResource(R.drawable.icon_all);
             viewHolder.markContentTextView.setVisibility(View.VISIBLE);
             viewHolder.markImageGridView.setVisibility(View.VISIBLE);
@@ -112,14 +124,75 @@ public class MarkCircleAdapter extends BindableAdapter<MarkCircleItem>{
         viewHolder.markTimeTextView.setText(mMarkTime);
         viewHolder.markAddressTextView.setText(mMarkAddress);
 
-        if(mMarkImagePathList != null && mMarkImagePathList.size() != 0){
-            mMarkCircleAdapter = new MarkCircleImageAdapter(mContext, mMarkImagePathList);
+        viewHolder.markEditTextView.setOnClickListener(new mOnClickListner(position));
+        viewHolder.markDeleteTextView.setOnClickListener(new mOnClickListner(position));
+        viewHolder.markImageGridView.setOnItemClickListener(new OnAdapterItemClickListener(position));
+
+
+        if(mMarkImageItemList != null && mMarkImageItemList.size() != 0){
+            mMarkCircleAdapter = new MarkCircleImageAdapter(mContext, mMarkImageItemList);
             viewHolder.markImageGridView.setAdapter(mMarkCircleAdapter);
         }
-
     }
 
-    private void initDatas() {
+    class OnAdapterItemClickListener implements AdapterView.OnItemClickListener{
+
+        private int positionParent;
+
+        public OnAdapterItemClickListener(int position){
+            this.positionParent = position;
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            mMarkImageItemList = mMarkCircleList.get(positionParent).getMarkImageItemList();
+            if(mMarkImageItemList != null && mMarkImageItemList.size() != 0){
+                Intent intent = new Intent();
+                intent.setClass(mContext, ImageZoomActivity.class);
+                intent.putExtra(MarkUtils.EXTRA_JUMP_FROM_PAGE, MarkUtils.JUMP_FROM_MARK_CIRCLE);
+                intent.putExtra(MarkUtils.EXTRA_IMAGE_LIST, (Serializable) mMarkImageItemList);
+                intent.putExtra(MarkUtils.EXTRA_CURRENT_IMG_POSITION, position);
+                mContext.startActivity(intent);
+            }
+        }
+    }
+
+    class mOnClickListner implements View.OnClickListener{
+
+        private int position;
+        public mOnClickListner(int position){
+            this.position = position;
+        }
+
+        @Override
+        public void onClick(View v) {
+             switch (v.getId()){
+                 case R.id.mark_edit_textview:
+                    Intent intentToEdit = new Intent();
+                    intentToEdit.putExtra(MarkUtils.EXTRA_MARK_CIRCLE_TO_MARK_EDIT, (Serializable)mMarkCircleList.get(position));
+                    intentToEdit.setClass(mContext, MarkEditActivity.class);
+                    mContext.startActivity(intentToEdit);
+                     break;
+                 case R.id.mark_delete_textview:
+                     new AlertDialog.Builder(mContext).setTitle(R.string.string_is_delete).setPositiveButton(R.string.string_confirm, new DialogInterface.OnClickListener() {
+                         @Override
+                         public void onClick(DialogInterface dialog, int which) {
+                             mMarkCircleList.remove(position);
+                             notifyDataSetChanged();
+                         }
+                     }).setNegativeButton(R.string.string_cancel, new DialogInterface.OnClickListener() {
+                         @Override
+                         public void onClick(DialogInterface dialog, int which) {
+
+                         }
+                     }).show();
+
+                     break;
+             }
+        }
+    }
+
+    private void initDatas(MarkCircleItem mMarkCircleItem) {
         mMarkId = mMarkCircleItem.getMarkId();
         mMarkTitle = mMarkCircleItem.getMarkTitle();
         if(mMarkTitle == null){
@@ -137,12 +210,16 @@ public class MarkCircleAdapter extends BindableAdapter<MarkCircleItem>{
         if(mMarkAddress == null){
             mMarkAddress = "";
         }
-        mMarkImagePathList = mMarkCircleItem.getMarkImagePathList();
+        mMarkImageItemList = mMarkCircleItem.getMarkImageItemList();
     }
 
     public void setList(ArrayList<MarkCircleItem> markCircleList){
         mMarkCircleList = markCircleList;
         notifyDataSetChanged();
+    }
+
+    public void setPosition(int position){
+        Log.d(TAG, "test position1: " + position);
     }
 
     private class ViewHolder{

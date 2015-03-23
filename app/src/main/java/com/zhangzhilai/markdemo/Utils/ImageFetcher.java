@@ -95,15 +95,17 @@ public class ImageFetcher {
                      if (bucket == null) {
                          bucket = new ImageBucket();
                          mImageBuckets.put(bucketName, bucket);
-                         bucket.imageList = new ArrayList<ImageItem>();
-                         bucket.bucketName = bucketName;
+                         bucket.setImageList(new ArrayList<ImageItem>());
+                         bucket.setBucketName(bucketName);
                      }
-                     bucket.count++;
+//                     bucket.count++;
+                     bucket.setCount(bucket.getCount() + 1);
+
                      ImageItem imageItem = new ImageItem();
                      imageItem.imageId = id;
                      imageItem.sourcePath = path;
                      imageItem.thumbnailPath = mThumbnailList.get(id);
-                     bucket.imageList.add(imageItem);
+                     bucket.getImageList().add(imageItem);
                  }
                  while (cursor.moveToNext());
              }

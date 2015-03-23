@@ -10,58 +10,58 @@ import java.util.ArrayList;
 public class MarkCircleItem implements Serializable{
 
     private static final long serialVersionUID = 7194425650480836368L;
-    private String MarkId;                      //标记id
-    private String MarkTitle;                   //标记标题
-    private String MarkTime;                    //标记时间
-    private String MarkContent;                 //标记内容
-    private String MarkAddress;                 //标记地址
-    private ArrayList<String> MarkImagePathList;//标记图片路径
+    private String markId;                      //标记id
+    private String markTitle;                   //标记标题
+    private String markTime;                    //标记时间
+    private String markContent;                 //标记内容
+    private String markAddress;                 //标记地址
+    private ArrayList<ImageItem> MarkImageItemList;//标记图片
 
     public String getMarkId() {
-        return MarkId;
+        return markId;
     }
 
     public void setMarkId(String markId) {
-        MarkId = markId;
+        this.markId = markId;
     }
 
     public String getMarkTime() {
-        return MarkTime;
+        return markTime;
     }
 
     public void setMarkTime(String markTime) {
-        MarkTime = markTime;
+        this.markTime = markTime;
     }
 
     public String getMarkContent() {
-        return MarkContent;
+        return markContent;
     }
 
     public void setMarkContent(String markContent) {
-        MarkContent = markContent;
+        this.markContent = markContent;
     }
 
     public String getMarkAddress() {
-        return MarkAddress;
+        return markAddress;
     }
 
     public void setMarkAddress(String markAddress) {
-        MarkAddress = markAddress;
-    }
-
-    public ArrayList<String> getMarkImagePathList() {
-        return MarkImagePathList;
-    }
-
-    public void setMarkImagePathList(ArrayList<String> markImagePathList) {
-        MarkImagePathList = markImagePathList;
+        this.markAddress = markAddress;
     }
 
     public String getMarkTitle() {
-        return MarkTitle;
+        return markTitle;
     }
 
     public void setMarkTitle(String markTitle) {
-        MarkTitle = markTitle;
+        this.markTitle = markTitle;
+    }
+
+    public ArrayList<ImageItem> getMarkImageItemList() {
+        return MarkImageItemList;
+    }
+
+    public void setMarkImageItemList(ArrayList<ImageItem> markImageItemList) {
+        MarkImageItemList = markImageItemList;
     }
 }

@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -21,14 +20,13 @@ import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
 
-import com.alibaba.fastjson.JSON;
+
 import com.zhangzhilai.markdemo.Activity.ImageBucketChooseActivity;
 import com.zhangzhilai.markdemo.Activity.ImageZoomActivity;
 import com.zhangzhilai.markdemo.Adapter.ImagePublishAdapter;
 import com.zhangzhilai.markdemo.Model.ImageItem;
-import com.zhangzhilai.markdemo.Utils.CustomConstants;
+import com.zhangzhilai.markdemo.Model.MarkCircleItem;
 import com.zhangzhilai.markdemo.Utils.MarkUtils;
-import com.zhangzhilai.markdemo.Utils.IntentConstants;
 
 import java.io.File;
 import java.io.Serializable;
@@ -42,8 +40,8 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
 
     public  static final String TAG = "MarkEditActivity";
 
-    public static List<ImageItem> mDataList = new ArrayList<ImageItem>();
-    private Context mContext;
+    public static List<ImageItem> mDataList;
+    private Context  mContext;
 
     private Button   mSaveButton;
     private Button   mGetImageBtn;
@@ -51,6 +49,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
     private ImageButton mBackButton;
 
     private ImagePublishAdapter mAdapter;
+    private MarkCircleItem mMarkCircleItem;
 
     private EditText mTitleEditText;
     private EditText mContentEditText;
@@ -61,23 +60,19 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "test onCreate");
         setContentView(R.layout.activity_mark_edit);
         mContext = this;
         initData();
         initViews();
         initListners();
-
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        saveTempToPref();
     }
 
     private void initData() {
-        if(mDataList.size() != 0){
-            mDataList.clear();
+        mDataList = new ArrayList<ImageItem>();
+        mMarkCircleItem = (MarkCircleItem)getIntent().getSerializableExtra(MarkUtils.EXTRA_MARK_CIRCLE_TO_MARK_EDIT);
+        if(mMarkCircleItem != null){
+            mDataList = mMarkCircleItem.getMarkImageItemList();
         }
     }
     private void initViews() {
@@ -91,18 +86,28 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
         mGridView = (GridView) findViewById(R.id.gridview);
         mGridView.setSelector(new ColorDrawable(Color.TRANSPARENT));
 
-        mAdapter = new ImagePublishAdapter(this, mDataList);
+        mAdapter = new ImagePublishAdapter(this, MarkUtils.JUMP_MARK_CIRCLE_TO_MARK_EDIT);
+        mAdapter.setDataList(mDataList);
         mGridView.setAdapter(mAdapter);
+
         refreshImageView();
     }
 
     private void refreshImageView(){
-        if(mDataList.size() == 0 ){
-            mGetImageBtn.setVisibility(View.VISIBLE);
-            mGridView.setVisibility(View.GONE);
-        } else {
-            mGetImageBtn.setVisibility(View.GONE);
-            mGridView.setVisibility(View.VISIBLE);
+        if(mMarkCircleItem != null){
+            String markCircleTitle = mMarkCircleItem.getMarkTitle() != null ? mMarkCircleItem.getMarkTitle() : "";
+            String markCircleContent = mMarkCircleItem.getMarkContent() != null ? mMarkCircleItem.getMarkContent() : "";
+            mTitleEditText.setText(markCircleTitle);
+            mContentEditText.setText(markCircleContent);
+        }
+        if(mDataList != null){
+            if(mDataList.size() != 0 ){
+                mGetImageBtn.setVisibility(View.GONE);
+                mGridView.setVisibility(View.VISIBLE);
+            } else {
+                mGetImageBtn.setVisibility(View.VISIBLE);
+                mGridView.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -117,17 +122,14 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
                     gotoGetImage();
                 } else {
                     Intent intent = new Intent(MarkEditActivity.this, ImageZoomActivity.class);
-                    intent.putExtra(IntentConstants.EXTRA_IMAGE_LIST, (Serializable) mDataList);
-                    intent.putExtra(IntentConstants.EXTRA_CURRENT_IMG_POSITION, position);
-                    startActivityForResult(intent, MarkUtils.IMAGE_ZOOM);
+                    intent.putExtra(MarkUtils.EXTRA_JUMP_FROM_PAGE, MarkUtils.JUMP_FROM_MARK_EDIT);
+                    intent.putExtra(MarkUtils.EXTRA_IMAGE_LIST, (Serializable) mDataList);
+                    intent.putExtra(MarkUtils.EXTRA_CURRENT_IMG_POSITION, position);
+                    startActivityForResult(intent, MarkUtils.JUMP_FROM_MARK_EDIT);
                 }
             }
         });
     }
-
-
-
-
 
     private void gotoGetImage(){
         new AlertDialog.Builder(mContext).setItems(R.array.select_image_type, new DialogInterface.OnClickListener() {
@@ -136,7 +138,7 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
                 switch (which){
                     case 0:
                         Intent intent = new Intent(mContext, ImageBucketChooseActivity.class);
-                        intent.putExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, getAvailableSize());
+                        intent.putExtra(MarkUtils.EXTRA_CAN_ADD_IMAGE_SIZE, getAvailableSize());
                         startActivityForResult(intent, MarkUtils.TAKE_PICTURE_FROM_ALBUM);
                         break;
                     case 1:
@@ -148,7 +150,10 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
     }
 
     private int getAvailableSize() {
-        int availSize = CustomConstants.MAX_IMAGE_SIZE - mDataList.size();
+        if(mDataList == null){
+            return MarkUtils.MAX_IMAGE_SIZE;
+        }
+        int availSize = MarkUtils.MAX_IMAGE_SIZE - mDataList.size();
         if (availSize >= 0) {
             return availSize;
         }
@@ -179,55 +184,47 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
         System.out.println("requestCode: " + requestCode + "resultCode" + resultCode);
         switch (requestCode) {
             case MarkUtils.TAKE_PICTURE_FROM_CAMERA:
-                if (mDataList.size() < CustomConstants.MAX_IMAGE_SIZE && resultCode == -1 && !TextUtils.isEmpty(mPath)) {
+                if (mDataList.size() < MarkUtils.MAX_IMAGE_SIZE && resultCode == -1 && !TextUtils.isEmpty(mPath)) {
                     ImageItem item = new ImageItem();
                     item.sourcePath = mPath;
                     mDataList.add(item);
+                    mAdapter.setDataList(mDataList);
+                    refreshImageView();
                 }
-                refreshImageView();
                 break;
-            case MarkUtils.IMAGE_ZOOM:
-                refreshImageView();
+            case MarkUtils.JUMP_FROM_MARK_EDIT:
+                if(resultCode == MarkUtils.RESULT_OK){
+                    List<ImageItem> deleteDataList = (List<ImageItem>) data.getSerializableExtra(MarkUtils.EXTRA_IMAGE_LIST);
+                    if(deleteDataList == null){
+                        return ;
+                    }
+                    if(mDataList.size() != 0){
+                        mDataList.clear();
+                    }
+                    mDataList.addAll(deleteDataList);
+                    mAdapter.setDataList(mDataList);
+                    refreshImageView();
+                }
                 break;
             case MarkUtils.TAKE_PICTURE_FROM_ALBUM:
                 if(resultCode == MarkUtils.RESULT_OK){
-                    List<ImageItem> incomingDataList = (List<ImageItem>) data.getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
-                    ImageItem item = incomingDataList.get(0);
+                    List<ImageItem> incomingDataList = (List<ImageItem>) data.getSerializableExtra(MarkUtils.EXTRA_IMAGE_LIST);
                     if (incomingDataList != null) {
+                        if(mDataList == null){
+                            //TODO mDataList为什么变为null，还需要跟一下
+                            mDataList = new ArrayList<ImageItem>();
+                        }
                         mDataList.addAll(incomingDataList);
+                        mAdapter.setDataList(mDataList);
+                        refreshImageView();
                     }
                 }
-                refreshImageView();
                 break;
         }
-    }
-
-
-    private void saveTempToPref() {
-        SharedPreferences sp = getSharedPreferences(CustomConstants.APPLICATION_NAME, MODE_PRIVATE);
-        String prefStr = JSON.toJSONString(mDataList);
-        sp.edit().putString(CustomConstants.PREF_TEMP_IMAGES, prefStr).commit();
-
     }
 
     private int getDataSize() {
         return mDataList == null ? 0 : mDataList.size();
-    }
-
-
-
-    private void getTempFromPref() {
-        SharedPreferences sp = getSharedPreferences(CustomConstants.APPLICATION_NAME, MODE_PRIVATE);
-        String prefStr = sp.getString(CustomConstants.PREF_TEMP_IMAGES, null);
-        if (!TextUtils.isEmpty(prefStr)) {
-            List<ImageItem> tempImages = JSON.parseArray(prefStr, ImageItem.class);
-            mDataList = tempImages;
-        }
-    }
-
-    private void removeTempFromPref() {
-        SharedPreferences sp = getSharedPreferences(CustomConstants.APPLICATION_NAME, MODE_PRIVATE);
-        sp.edit().remove(CustomConstants.PREF_TEMP_IMAGES).commit();
     }
 
     @Override
@@ -250,21 +247,22 @@ public class MarkEditActivity extends Activity implements View.OnClickListener{
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "test onResume");
-        notifyDataChanged(); // 当在ImageZoomActivity中删除图片时，返回这里需要刷新
+//        notifyDataChanged(); // 当在ImageZoomActivity中删除图片时，返回这里需要刷新
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "test onPause");
-        saveTempToPref();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mDataList.clear();
-
+        Log.d(TAG, "test onDestroy");
+        if(mDataList != null){
+            mDataList.clear();
+        }
     }
 
     private void notifyDataChanged() {

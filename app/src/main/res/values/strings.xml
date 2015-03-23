@@ -8,16 +8,17 @@
     <string name="string_album">相册</string>
 
     <!--mark_edit page  -->
+    <string name="string_mark_circle_title">标记圈</string>
     <string name="string_mark_button">标记</string>
     <string name="string_mark_edit">标记编辑</string>
     <string name="string_save">保存</string>
     <string name="string_mark_title">标题（可选）</string>
 
     <!--相册-->
-    <string name="image_bucket_name">相册名称</string>
-    <string name="cancel">取消</string>
-    <string name="take_photo">拍照</string>
-    <string name="select_from_local">从相册中选取</string>
+    <string name="string_image_bucket_name">相册名称</string>
+    <string name="string_cancel">取消</string>
+    <string name="string_take_photo">拍照</string>
+    <string name="string_select_from_local">从相册中选取</string>
 
     <!-- 下拉刷新 -->
     <string name="pull_down_RefreshingLabel">刷新中</string>
@@ -30,5 +31,7 @@
     <!--  标记圈  -->
     <string name="string_edit">编辑</string>
     <string name="string_delete">删除</string>
+    <string name="string_is_delete">确定删除?</string>
+    <string name="string_confirm">确定</string>
 
 </resources>

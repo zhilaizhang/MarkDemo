@@ -1,9 +1,12 @@
 package com.zhangzhilai.markdemo.Activity;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,11 +18,12 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.zhangzhilai.markdemo.MarkEditActivity;
 import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.R;
-import com.zhangzhilai.markdemo.Utils.ImageDisplayer;
-import com.zhangzhilai.markdemo.Utils.IntentConstants;
+import com.zhangzhilai.markdemo.Utils.ImageUtils;
+import com.zhangzhilai.markdemo.Utils.MarkUtils;
 
 /**
  * Created by zhangzhilai on 3/17/15.
@@ -27,39 +31,61 @@ import com.zhangzhilai.markdemo.Utils.IntentConstants;
 public class ImageZoomActivity extends Activity implements View.OnClickListener{
 
     public  static final String TAG = "ImageZoomActivity";
+    private Context         mContext;
+    private ViewPager       mPager;
+    private MyPageAdapter   mAdapter;
+    private RelativeLayout  mPhotoRelativeLayout;
+    private Button          mExitButton;
+    private Button          mDeleteButton;
 
-    private ViewPager mPager;
-    private MyPageAdapter mAdapter;
-    private int mCurrentPosition;
-    private List<ImageItem> mDataList = new ArrayList<ImageItem>();
+    private ImageLoader     mImageLoader;
 
-    private RelativeLayout mPhotoRelativeLayout;
+    private List<ImageItem> mDataList;
+
+    private int             mCurrentPosition;
+    private int             mPageJumpFrom;
+
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "test onCreate");
         setContentView(R.layout.activity_zoom);
-
-        mPhotoRelativeLayout = (RelativeLayout) findViewById(R.id.photo_relativeLayout);
-        mPhotoRelativeLayout.setBackgroundColor(0x70000000);
-
+        mContext = this;
+        initViews();
         initData();
+        initListeners();
+    }
 
-        Button photo_bt_exit = (Button) findViewById(R.id.photo_bt_exit);
-        photo_bt_exit.setOnClickListener(this);
-        Button photo_bt_del = (Button) findViewById(R.id.photo_bt_del);
-        photo_bt_del.setOnClickListener(this);
 
-        mPager = (ViewPager) findViewById(R.id.viewpager);
-        mPager.setOnPageChangeListener(pageChangeListener);
 
+    private void initData() {
+        mDataList = new ArrayList<ImageItem>();
+        mImageLoader = ImageUtils.getImageLoader(mContext);
+        mPageJumpFrom = getIntent().getIntExtra(MarkUtils.EXTRA_JUMP_FROM_PAGE, 0);
+        mCurrentPosition = getIntent().getIntExtra(MarkUtils.EXTRA_CURRENT_IMG_POSITION, 0);
+        mDataList = (List<ImageItem>)getIntent().getSerializableExtra(MarkUtils.EXTRA_IMAGE_LIST);
         mAdapter = new MyPageAdapter(mDataList);
         mPager.setAdapter(mAdapter);
         mPager.setCurrentItem(mCurrentPosition);
+        if(mPageJumpFrom == MarkUtils.JUMP_FROM_MARK_CIRCLE){
+            mDeleteButton.setVisibility(View.GONE);
+        }
+
     }
 
-    private void initData() {
-        mCurrentPosition = getIntent().getIntExtra(IntentConstants.EXTRA_CURRENT_IMG_POSITION, 0);
-        mDataList = MarkEditActivity.mDataList;
+    private void initViews(){
+        mPhotoRelativeLayout = (RelativeLayout) findViewById(R.id.photo_relativeLayout);
+        mPhotoRelativeLayout.setBackgroundColor(0x70000000);
+        mDeleteButton = (Button) findViewById(R.id.photo_bt_del);
+        mPager = (ViewPager) findViewById(R.id.viewpager);
+        mExitButton = (Button) findViewById(R.id.photo_bt_exit);
+
+    }
+
+    private void initListeners() {
+        mExitButton.setOnClickListener(this);
+        mDeleteButton.setOnClickListener(this);
+        mPager.setOnPageChangeListener(pageChangeListener);
     }
 
     private void removeImgs() {
@@ -90,12 +116,14 @@ public class ImageZoomActivity extends Activity implements View.OnClickListener{
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.photo_bt_exit:
-                finish();
+                backDataList();
+//                finish();
                 break;
             case R.id.photo_bt_del:
                 if (mDataList.size() == 1) {
                     removeImgs();
-                    finish();
+                    backDataList();
+//                    finish();
                 } else {
                     removeImg(mCurrentPosition);
                     mPager.removeAllViews();
@@ -104,6 +132,13 @@ public class ImageZoomActivity extends Activity implements View.OnClickListener{
                 }
                 break;
         }
+    }
+
+    private void backDataList(){
+        Intent intent = new Intent();
+        intent.putExtra(MarkUtils.EXTRA_IMAGE_LIST, (Serializable)mDataList);
+        setResult(MarkUtils.RESULT_OK, intent);
+        finish();
     }
 
     class MyPageAdapter extends PagerAdapter {
@@ -116,7 +151,15 @@ public class ImageZoomActivity extends Activity implements View.OnClickListener{
             for (int i = 0; i != size; i++) {
                 ImageView iv = new ImageView(ImageZoomActivity.this);
                 Log.d(TAG, "test sourcePath: " + dataList.get(i).sourcePath);
-                ImageDisplayer.getInstance(ImageZoomActivity.this).displayBmp(iv, null, dataList.get(i).sourcePath, false);
+                String tempPath = "";
+                if(dataList.get(i).sourcePath.contains("http://") || dataList.get(i).sourcePath.contains("file://")){
+                    tempPath = dataList.get(i).sourcePath;
+                } else {
+                    tempPath = "file://" + dataList.get(i).sourcePath;
+                }
+
+                mImageLoader.displayImage(tempPath, iv, ImageUtils.getDefaultImageOptions());
+//                ImageDisplayer.getInstance(ImageZoomActivity.this).displayBmp(iv, null, dataList.get(i).sourcePath, false);
                 iv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
                 mViews.add(iv);
             }
@@ -154,4 +197,5 @@ public class ImageZoomActivity extends Activity implements View.OnClickListener{
         }
 
     }
+
 }

@@ -4,22 +4,27 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.Adapter;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-
-import com.handmark.pulltorefresh.library.ILoadingLayout;
-import com.handmark.pulltorefresh.library.PullToRefreshBase;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
-import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
-import com.handmark.pulltorefresh.library.PullToRefreshListView;
-import com.zhangzhilai.markdemo.Adapter.MarkCircleAdapter;
-import com.zhangzhilai.markdemo.Model.MarkCircleItem;
-import com.zhangzhilai.markdemo.R;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.handmark.pulltorefresh.library.ILoadingLayout;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.zhangzhilai.markdemo.Adapter.MarkCircleAdapter;
+import com.zhangzhilai.markdemo.Model.ImageItem;
+import com.zhangzhilai.markdemo.Model.MarkCircleItem;
+import com.zhangzhilai.markdemo.R;
+import com.zhangzhilai.markdemo.Utils.MarkUtils;
+
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -36,6 +41,8 @@ public class MarkCircleActivity extends Activity implements OnItemClickListener,
     private MarkCircleAdapter mMarkCircleAdapter;
     private ArrayList<MarkCircleItem> mMarkCircleList;
     private MarkCircleItem mMarkCircleItem;
+    private TextView       mTitleTextView;
+    private TextView       mBackTextView;
 
 
     @Override
@@ -51,6 +58,9 @@ public class MarkCircleActivity extends Activity implements OnItemClickListener,
 
 
     private void initViews() {
+        mBackTextView  = (TextView)findViewById(R.id.back_text);
+        mTitleTextView = (TextView)findViewById(R.id.title);
+        mTitleTextView.setText(R.string.string_mark_circle_title);
         mPullToRefreshListView = (PullToRefreshListView)findViewById(R.id.pull_to_refresh_listview);
         initAdapter();
         initPullRefreshListView();
@@ -58,7 +68,7 @@ public class MarkCircleActivity extends Activity implements OnItemClickListener,
     }
 
     private void initListeners() {
-
+        mBackTextView.setOnClickListener(this);
     }
 
     private void initAdapter(){
@@ -106,14 +116,26 @@ public class MarkCircleActivity extends Activity implements OnItemClickListener,
         mMarkCircleItem3.setMarkId("123");
         mMarkCircleItem3.setMarkTitle("沃尔玛");
         mMarkCircleItem3.setMarkContent("沃尔玛公司（Wal-Mart Stores, Inc.）（NYSE：WMT）是一家美国的世界性连锁企业，以营业额计算为全球最大的公司，其控股人为沃尔顿家族。总部位于美国阿肯色州的本顿维尔。 ");
-        ArrayList<String> imagePathList = new ArrayList<String>();
-        imagePathList.add("http://img5.imgtn.bdimg.com/it/u=1041153494,1223721837&fm=23&gp=0.jpg");
-        imagePathList.add("http://img0.imgtn.bdimg.com/it/u=125652165,2870162493&fm=23&gp=0.jpg");
-        imagePathList.add("http://img1.imgtn.bdimg.com/it/u=651986609,1848241502&fm=23&gp=0.jpg");
-        imagePathList.add("http://img3.imgtn.bdimg.com/it/u=3791936296,679007535&fm=23&gp=0.jpg");
-        imagePathList.add("http://img0.imgtn.bdimg.com/it/u=2391252400,1093025192&fm=23&gp=0.jpg");
-        imagePathList.add("http://img0.imgtn.bdimg.com/it/u=3305723592,2742771748&fm=23&gp=0.jpg");
-        mMarkCircleItem3.setMarkImagePathList(imagePathList);
+        ArrayList<ImageItem> imagePathList = new ArrayList<ImageItem>();
+        ImageItem imageItem = new ImageItem();
+        imageItem.setSourcePath("http://img5.imgtn.bdimg.com/it/u=1041153494,1223721837&fm=23&gp=0.jpg");
+        imagePathList.add(imageItem);
+        imageItem = new ImageItem();
+        imageItem.setSourcePath("http://img0.imgtn.bdimg.com/it/u=125652165,2870162493&fm=23&gp=0.jpg");
+        imagePathList.add(imageItem);
+        imageItem = new ImageItem();
+        imageItem.setSourcePath("http://img1.imgtn.bdimg.com/it/u=651986609,1848241502&fm=23&gp=0.jpg");
+        imagePathList.add(imageItem);
+        imageItem = new ImageItem();
+        imageItem.setSourcePath("http://img3.imgtn.bdimg.com/it/u=3791936296,679007535&fm=23&gp=0.jpg");
+        imagePathList.add(imageItem);
+        imageItem = new ImageItem();
+        imageItem.setSourcePath("http://img0.imgtn.bdimg.com/it/u=2391252400,1093025192&fm=23&gp=0.jpg");
+        imagePathList.add(imageItem);
+        imageItem = new ImageItem();
+        imageItem.setSourcePath("http://img0.imgtn.bdimg.com/it/u=3305723592,2742771748&fm=23&gp=0.jpg");
+        imagePathList.add(imageItem);
+        mMarkCircleItem3.setMarkImageItemList(imagePathList);
         mMarkCircleItem3.setMarkTime("2015.3.20");
         mMarkCircleItem3.setMarkAddress("上海市浦东新区施镇路");
         mMarkCircleList.add(mMarkCircleItem3);
@@ -122,29 +144,81 @@ public class MarkCircleActivity extends Activity implements OnItemClickListener,
         mMarkCircleItem4.setMarkId("123");
         mMarkCircleItem4.setMarkTitle("沃尔玛88");
         mMarkCircleItem4.setMarkContent("sfdfasdfsdf沃尔玛公司（Wal-Mart Stores, Inc.）（NYSE：WMT）是一家美国的世界性连锁企业，以营业额计算为全球最大的公司，其控股人为沃尔顿家族。总部位于美国阿肯色州的本顿维尔。 ");
-        ArrayList<String> imagePathList1 = new ArrayList<String>();
-        imagePathList1.add("file:///mnt/sdcard/HJApp/HJDict/images/bbs_banner.png");
-        imagePathList1.add("file:///mnt/sdcard/HJApp/HJNCE/images/bbs_banner.png");
-        imagePathList1.add("file:///mnt/sdcard/HJApp/wordgamesexperience/images/bbs_banner.png");
-        imagePathList1.add("file:///mnt/sdcard/HJApp/HJJPNews/Image/wh5106.jpg");
-        imagePathList1.add("file:///mnt/sdcard/HJApp/HJJPNews/Image/dongman7170.jpg");
-        imagePathList1.add("file:///mnt/sdcard/HJApp/HJJPNews/Image/ch5844.jpg");
-        mMarkCircleItem4.setMarkImagePathList(imagePathList1);
+        ArrayList<ImageItem> imagePathList1 = new ArrayList<ImageItem>();
+        ImageItem imageItem1 = new ImageItem();
+        imageItem1.setSourcePath("file:///mnt/sdcard/HJApp/HJDict/images/bbs_banner.png");
+        imagePathList1.add(imageItem1);
+        imageItem1 = new ImageItem();
+        imageItem1.setSourcePath("file:///mnt/sdcard/HJApp/HJNCE/images/bbs_banner.png");
+        imagePathList1.add(imageItem1);
+        imageItem1 = new ImageItem();
+        imageItem1.setSourcePath("file:///mnt/sdcard/HJApp/wordgamesexperience/images/bbs_banner.png");
+        imagePathList1.add(imageItem1);
+        imageItem1 = new ImageItem();
+        imageItem1.setSourcePath("file:///mnt/sdcard/HJApp/HJJPNews/Image/wh5106.jpg");
+        imagePathList1.add(imageItem1);
+        imageItem1 = new ImageItem();
+        imageItem1.setSourcePath("file:///mnt/sdcard/HJApp/HJJPNews/Image/dongman7170.jpg");
+        imagePathList1.add(imageItem1);
+        imageItem1 = new ImageItem();
+        imageItem1.setSourcePath("file:///mnt/sdcard/HJApp/HJJPNews/Image/ch5844.jpg");
+        imagePathList1.add(imageItem1);
+        mMarkCircleItem4.setMarkImageItemList(imagePathList1);
         mMarkCircleItem4.setMarkTime("2015.3.21");
         mMarkCircleItem4.setMarkAddress("上海市浦东新区施镇路46664");
         mMarkCircleList.add(mMarkCircleItem4);
 
+        listToJson(mMarkCircleList);
+//        MarkCircleItem mMarkCircleItem5 = new MarkCircleItem();
+//        mMarkCircleItem5.setMarkId("123");
+//        mMarkCircleItem5.setMarkTitle("沃尔玛88");
+//        mMarkCircleItem5.setMarkContent("sfdfasdfsdf沃尔玛公司（Wal-Mart Stores, Inc.）（NYSE：WMT）是一家美国的世界性连锁企业，以营业额计算为全球最大的公司，其控股人为沃尔顿家族。总部位于美国阿肯色州的本顿维尔。 ");
+//        ArrayList<ImageItem> imagePathList2 = new ArrayList<ImageItem>();
+//        ImageItem imageItem2 = new ImageItem();
+//        imageItem2.setSourcePath("file:///mnt/sdcard/HJApp/HJDict/images/bbs_banner.png");
+//        imagePathList2.add(imageItem2);
+//        imageItem2 = new ImageItem();
+//        imageItem2.setSourcePath("file:///mnt/sdcard/HJApp/HJNCE/images/bbs_banner.png");
+//        imagePathList2.add(imageItem2);
+//        imageItem2 = new ImageItem();
+//        imageItem2.setSourcePath("file:///mnt/sdcard/HJApp/wordgamesexperience/images/bbs_banner.png");
+//        imagePathList2.add(imageItem2);
+//        imageItem2 = new ImageItem();
+//        imageItem2.setSourcePath("file:///mnt/sdcard/HJApp/HJJPNews/Image/wh5106.jpg");
+//        imagePathList2.add(imageItem2);
+//        imageItem2 = new ImageItem();
+//        imageItem2.setSourcePath("file:///mnt/sdcard/HJApp/HJJPNews/Image/dongman7170.jpg");
+//        imagePathList1.add(imageItem2);
+//        imageItem2 = new ImageItem();
+//        imageItem2.setSourcePath("file:///mnt/sdcard/HJApp/HJJPNews/Image/ch5844.jpg");
+//        imagePathList2.add(imageItem2);
+//        mMarkCircleItem5.setMarkImageItemList(imagePathList2);
+//        mMarkCircleItem5.setMarkTime("2015.3.21");
+//        mMarkCircleItem5.setMarkAddress("上海市浦东新区施镇路46664");
+
+//        mMarkCircleList.add(mMarkCircleItem5);
+
         mMarkCircleAdapter.setList(mMarkCircleList);
+    }
+
+    private void listToJson(ArrayList<MarkCircleItem> markCircleList){
+        Gson gson = new Gson();
+        String markCircleString = gson.toJson(markCircleList);
+        MarkUtils.saveString2File(markCircleString, MarkUtils.FILE_NAME);
     }
 
     @Override
     public void onClick(View v) {
-
+        switch (v.getId()){
+            case R.id.back_text:
+                finish();
+            break;
+        }
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+        mMarkCircleAdapter.setPosition(position);
     }
 
     /**

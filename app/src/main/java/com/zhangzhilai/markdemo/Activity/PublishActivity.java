@@ -34,8 +34,7 @@ import com.alibaba.fastjson.JSON;
 import com.zhangzhilai.markdemo.Adapter.ImagePublishAdapter;
 import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.R;
-import com.zhangzhilai.markdemo.Utils.CustomConstants;
-import com.zhangzhilai.markdemo.Utils.IntentConstants;
+import com.zhangzhilai.markdemo.Utils.MarkUtils;
 
 /**
  * Created by zhangzhilai on 3/17/15.
@@ -66,15 +65,15 @@ public class PublishActivity extends Activity {
     }
 
     private void saveTempToPref() {
-        SharedPreferences sp = getSharedPreferences(CustomConstants.APPLICATION_NAME, MODE_PRIVATE);
+        SharedPreferences sp = getSharedPreferences(MarkUtils.APPLICATION_NAME, MODE_PRIVATE);
         String prefStr = JSON.toJSONString(mDataList);
-        sp.edit().putString(CustomConstants.PREF_TEMP_IMAGES, prefStr).commit();
+        sp.edit().putString(MarkUtils.PREF_TEMP_IMAGES, prefStr).commit();
 
     }
 
     private void getTempFromPref() {
-        SharedPreferences sp = getSharedPreferences(CustomConstants.APPLICATION_NAME, MODE_PRIVATE);
-        String prefStr = sp.getString(CustomConstants.PREF_TEMP_IMAGES, null);
+        SharedPreferences sp = getSharedPreferences(MarkUtils.APPLICATION_NAME, MODE_PRIVATE);
+        String prefStr = sp.getString(MarkUtils.PREF_TEMP_IMAGES, null);
         if (!TextUtils.isEmpty(prefStr)) {
             List<ImageItem> tempImages = JSON.parseArray(prefStr, ImageItem.class);
             mDataList = tempImages;
@@ -82,14 +81,14 @@ public class PublishActivity extends Activity {
     }
 
     private void removeTempFromPref() {
-        SharedPreferences sp = getSharedPreferences(CustomConstants.APPLICATION_NAME, MODE_PRIVATE);
-        sp.edit().remove(CustomConstants.PREF_TEMP_IMAGES).commit();
+        SharedPreferences sp = getSharedPreferences(MarkUtils.APPLICATION_NAME, MODE_PRIVATE);
+        sp.edit().remove(MarkUtils.PREF_TEMP_IMAGES).commit();
     }
 
     @SuppressWarnings("unchecked")
     private void initData() {
         getTempFromPref();
-        List<ImageItem> incomingDataList = (List<ImageItem>) getIntent().getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
+        List<ImageItem> incomingDataList = (List<ImageItem>) getIntent().getSerializableExtra(MarkUtils.EXTRA_IMAGE_LIST);
         if (incomingDataList != null) {
             mDataList.addAll(incomingDataList);
         }
@@ -114,8 +113,8 @@ public class PublishActivity extends Activity {
                     new PopupWindows(PublishActivity.this, mGridView);
                 } else {
                     Intent intent = new Intent(PublishActivity.this, ImageZoomActivity.class);
-                    intent.putExtra(IntentConstants.EXTRA_IMAGE_LIST, (Serializable) mDataList);
-                    intent.putExtra(IntentConstants.EXTRA_CURRENT_IMG_POSITION, position);
+                    intent.putExtra(MarkUtils.EXTRA_IMAGE_LIST, (Serializable) mDataList);
+                    intent.putExtra(MarkUtils.EXTRA_CURRENT_IMG_POSITION, position);
                     startActivity(intent);
                 }
             }
@@ -137,7 +136,7 @@ public class PublishActivity extends Activity {
     }
 
     private int getAvailableSize() {
-        int availSize = CustomConstants.MAX_IMAGE_SIZE - mDataList.size();
+        int availSize = MarkUtils.MAX_IMAGE_SIZE - mDataList.size();
         if (availSize >= 0) {
             return availSize;
         }
@@ -183,7 +182,7 @@ public class PublishActivity extends Activity {
             bt2.setOnClickListener(new OnClickListener() {
                 public void onClick(View v) {
                     Intent intent = new Intent(PublishActivity.this, ImageBucketChooseActivity.class);
-                    intent.putExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, getAvailableSize());
+                    intent.putExtra(MarkUtils.EXTRA_CAN_ADD_IMAGE_SIZE, getAvailableSize());
                     startActivity(intent);
                     dismiss();
                 }
@@ -221,7 +220,7 @@ public class PublishActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
             case TAKE_PICTURE:
-                if (mDataList.size() < CustomConstants.MAX_IMAGE_SIZE && resultCode == -1 && !TextUtils.isEmpty(path)) {
+                if (mDataList.size() < MarkUtils.MAX_IMAGE_SIZE && resultCode == -1 && !TextUtils.isEmpty(path)) {
                     ImageItem item = new ImageItem();
                     item.sourcePath = path;
                     mDataList.add(item);

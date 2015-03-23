@@ -24,9 +24,7 @@ import com.zhangzhilai.markdemo.Adapter.ImageGridAdapter;
 import com.zhangzhilai.markdemo.MarkEditActivity;
 import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.R;
-import com.zhangzhilai.markdemo.Utils.CustomConstants;
 import com.zhangzhilai.markdemo.Utils.MarkUtils;
-import com.zhangzhilai.markdemo.Utils.IntentConstants;
 
 
 /**
@@ -53,15 +51,15 @@ public class ImageChooseActivity extends  Activity {
 
         setContentView(R.layout.activity_image_choose);
 
-        mDataList = (List<ImageItem>) getIntent().getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
+        mDataList = (List<ImageItem>) getIntent().getSerializableExtra(MarkUtils.EXTRA_IMAGE_LIST);
         if (mDataList == null)
             mDataList = new ArrayList<ImageItem>();
-        mBucketName = getIntent().getStringExtra(IntentConstants.EXTRA_BUCKET_NAME);
+        mBucketName = getIntent().getStringExtra(MarkUtils.EXTRA_BUCKET_NAME);
 
         if (TextUtils.isEmpty(mBucketName)) {
             mBucketName = "请选择";
         }
-        mAvailableSize = getIntent().getIntExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, CustomConstants.MAX_IMAGE_SIZE);
+        mAvailableSize = getIntent().getIntExtra(MarkUtils.EXTRA_CAN_ADD_IMAGE_SIZE, MarkUtils.MAX_IMAGE_SIZE);
 
         initView();
         initListener();
@@ -88,7 +86,7 @@ public class ImageChooseActivity extends  Activity {
 
             public void onClick(View v) {
                 Intent intent = new Intent(ImageChooseActivity.this, MarkEditActivity.class);
-                intent.putExtra(IntentConstants.EXTRA_IMAGE_LIST, (Serializable) new ArrayList<ImageItem>(selectedImgs.values()));
+                intent.putExtra(MarkUtils.EXTRA_IMAGE_LIST, (Serializable) new ArrayList<ImageItem>(selectedImgs.values()));
 //                startActivity(intent);
                 setResult(MarkUtils.RESULT_OK, intent);
                 finish();

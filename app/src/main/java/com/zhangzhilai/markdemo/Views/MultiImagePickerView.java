@@ -9,7 +9,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -20,8 +19,7 @@ import android.util.AttributeSet;
 import com.zhangzhilai.markdemo.Activity.ImageBucketChooseActivity;
 import com.zhangzhilai.markdemo.Model.ImageItem;
 import com.zhangzhilai.markdemo.R;
-import com.zhangzhilai.markdemo.Utils.CustomConstants;
-import com.zhangzhilai.markdemo.Utils.IntentConstants;
+import com.zhangzhilai.markdemo.Utils.MarkUtils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -76,7 +74,7 @@ public class MultiImagePickerView extends LinearLayout implements View.OnClickLi
                 switch (which){
                     case 0:
                         Intent intent = new Intent(mContext, ImageBucketChooseActivity.class);
-                        intent.putExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, getAvailableSize());
+                        intent.putExtra(MarkUtils.EXTRA_CAN_ADD_IMAGE_SIZE, getAvailableSize());
                         mContext.startActivity(intent);
                         break;
                     case 1:
@@ -88,7 +86,7 @@ public class MultiImagePickerView extends LinearLayout implements View.OnClickLi
     }
 
     private int getAvailableSize() {
-        int availSize = CustomConstants.MAX_IMAGE_SIZE - mDataList.size();
+        int availSize = MarkUtils.MAX_IMAGE_SIZE - mDataList.size();
         if (availSize >= 0) {
             return availSize;
         }
@@ -117,7 +115,7 @@ public class MultiImagePickerView extends LinearLayout implements View.OnClickLi
         System.out.println("onActivityResult");
         switch (requestCode) {
             case TAKE_PICTURE:
-                if (mDataList.size() < CustomConstants.MAX_IMAGE_SIZE && resultCode == -1 && !TextUtils.isEmpty(mPath)) {
+                if (mDataList.size() < MarkUtils.MAX_IMAGE_SIZE && resultCode == -1 && !TextUtils.isEmpty(mPath)) {
                     ImageItem item = new ImageItem();
                     item.sourcePath = mPath;
                     mDataList.add(item);

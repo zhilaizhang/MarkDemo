@@ -28,7 +28,7 @@
                 android:background="@drawable/btn"
                 android:textColor="@color/deep_gray"
                 android:textSize="18sp"
-                android:text="@string/take_photo" />
+                android:text="@string/string_take_photo" />
         </LinearLayout>
 
         <TextView

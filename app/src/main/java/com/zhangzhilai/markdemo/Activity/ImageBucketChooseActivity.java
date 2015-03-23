@@ -11,10 +11,8 @@ import android.widget.ListView;
 import com.zhangzhilai.markdemo.Adapter.ImageBucketAdapter;
 import com.zhangzhilai.markdemo.Model.ImageBucket;
 import com.zhangzhilai.markdemo.R;
-import com.zhangzhilai.markdemo.Utils.CustomConstants;
-import com.zhangzhilai.markdemo.Utils.MarkUtils;
 import com.zhangzhilai.markdemo.Utils.ImageFetcher;
-import com.zhangzhilai.markdemo.Utils.IntentConstants;
+import com.zhangzhilai.markdemo.Utils.MarkUtils;
 
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -48,7 +46,7 @@ public class ImageBucketChooseActivity  extends Activity implements View.OnClick
     private void initData(){
         mDataList = new ArrayList<ImageBucket>();
         mDataList = mHelper.getImagesBucketList(false);
-        availableSize = getIntent().getIntExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, CustomConstants.MAX_IMAGE_SIZE);
+        availableSize = getIntent().getIntExtra(MarkUtils.EXTRA_CAN_ADD_IMAGE_SIZE, MarkUtils.MAX_IMAGE_SIZE);
     }
 
     private void initView(){
@@ -66,9 +64,9 @@ public class ImageBucketChooseActivity  extends Activity implements View.OnClick
                 selectOne(position);
 
                 Intent intent = new Intent(ImageBucketChooseActivity.this, ImageChooseActivity.class);
-                intent.putExtra(IntentConstants.EXTRA_IMAGE_LIST, (Serializable) mDataList.get(position).imageList);
-                intent.putExtra(IntentConstants.EXTRA_BUCKET_NAME, mDataList.get(position).bucketName);
-                intent.putExtra(IntentConstants.EXTRA_CAN_ADD_IMAGE_SIZE, availableSize);
+                intent.putExtra(MarkUtils.EXTRA_IMAGE_LIST, (Serializable) mDataList.get(position).getImageList());
+                intent.putExtra(MarkUtils.EXTRA_BUCKET_NAME, mDataList.get(position).getBucketName());
+                intent.putExtra(MarkUtils.EXTRA_CAN_ADD_IMAGE_SIZE, availableSize);
                 startActivityForResult(intent, MarkUtils.BUCKETCHOOSE_TO_IMAGECHOOSE);
             }
         });
@@ -86,9 +84,9 @@ public class ImageBucketChooseActivity  extends Activity implements View.OnClick
         int size = mDataList.size();
         for (int i = 0; i != size; i++){
             if (i == position) {
-                mDataList.get(i).selected = true;
+                mDataList.get(i).setSelected(true);
             } else {
-                mDataList.get(i).selected = false;
+                mDataList.get(i).setSelected(false);
             }
         }
         mAdapter.notifyDataSetChanged();
