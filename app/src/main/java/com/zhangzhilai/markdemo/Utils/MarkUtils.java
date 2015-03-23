@@ -28,6 +28,9 @@ public class MarkUtils {
     public static final String FLIE_PATH = SDCARD_PATH + "MarkDemo" + File.separator;
     public static final String FILE_NAME = "MarkCircleText";
 
+    public static final String SHAREPREFER_CONFIG = "shareprefer_config";
+    public static final String IS_FIRST_INSTALL = "is_first_install";
+
     public static final int RESULT_OK = 0x000088;                    //表示跳转成功
     public static final int TAKE_PICTURE_FROM_CAMERA = 0x000000;     //从相机获取图片
     public static final int TAKE_PICTURE_FROM_ALBUM = 0X000001;      //从相册获取图片
